@@ -1,12 +1,25 @@
 import numpy as np
 
 
-def repeat_check(sudoku_grid, location): #checks if given column has same value more than once at given sudoku grid
+def is_repeating(sudoku_grid, location):  # checks if given column has same value more than once at given sudoku grid
     Y, X, y, x = location
     return((len(np.argwhere(sudoku_grid[Y, :, y, :] == sudoku_grid[Y, X, y, x]))) > 1 or
            (len(np.argwhere(sudoku_grid[:, X, :, x] == sudoku_grid[Y, X, y, x]))) > 1 or
            (len(np.argwhere(sudoku_grid[Y, X, :, :] == sudoku_grid[Y, X, y, x]))) > 1
            )
+
+
+def one_possible(sudoku_grid, location):  # if a place only has one possible number, it is it
+    Y, X, y, x = location
+    temp = sudoku_grid
+    possibles = []
+    for i in range(1, 10):
+        temp[Y, X, y, x] = i
+        if not is_repeating(sudoku_grid, location):
+            possibles.append(i)
+    temp[Y, X, y, x] = 0
+    if len(possibles) == 1:
+        temp[Y, X, y, x] = possibles[0]
 
 
 m = np.zeros((3, 3, 3, 3))  # Y, X, y, x
@@ -48,5 +61,9 @@ m[2, 0, 2, 2] = 3
 m[2, 1, 2, 1] = 1
 m[2, 1, 2, 2] = 8
 
-print(m)
-print(repeat_check(m, [1, 0, 0, 0]))
+
+while len(np.argwhere(m[:, :, :, :] == 0)) > 0 :
+    empties = np.argwhere(m[:, :, :, :] == 0)
+    for i in empties:
+        one_possible(m, i)
+    print(m)
